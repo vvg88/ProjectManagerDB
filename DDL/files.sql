@@ -1,0 +1,7 @@
+CREATE TABLE files (
+    file_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    task_id BIGINT NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+    file_name TEXT NOT NULL,
+    file_path TEXT NOT NULL,
+    uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
