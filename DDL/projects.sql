@@ -4,7 +4,7 @@ CREATE TABLE projects (
     description TEXT,
     start_date DATE,
     end_date DATE,
-    status TEXT NOT NULL DEFAULT 'planned',
+    status_id BIGINT NOT NULL REFERENCES statuses(status_id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     owner_id BIGINT NOT NULL REFERENCES users(id)
 );
