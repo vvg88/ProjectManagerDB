@@ -1,6 +1,6 @@
 CREATE TABLE teams (
     team_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    team_name TEXT NOT NULL,
+    team_name VARCHAR(128) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     owner_id BIGINT REFERENCES users(id) ON DELETE SET NULL
 );

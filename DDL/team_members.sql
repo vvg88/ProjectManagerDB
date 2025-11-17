@@ -2,5 +2,5 @@ CREATE TABLE team_members (
     team_member_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     team_id BIGINT NOT NULL REFERENCES teams(team_id) ON DELETE CASCADE,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    role TEXT NOT NULL DEFAULT 'member'
+    role VARCHAR(32) NOT NULL DEFAULT 'member'
 );

@@ -1,6 +1,6 @@
 CREATE TABLE projects (
     project_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    project_name TEXT NOT NULL,
+    project_name VARCHAR(255) NOT NULL,
     description TEXT,
     start_date DATE,
     end_date DATE,
