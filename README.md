@@ -10,8 +10,8 @@
 
 ## users
 - id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
-- username — TEXT, NOT NULL, UNIQUE  
-- email — TEXT  
+- username — VARCHAR(255), NOT NULL, UNIQUE  
+- email — VARCHAR(255), NOT NULL, UNIQUE  
 - password_hash — TEXT, NOT NULL  
 - created_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()
 
@@ -21,7 +21,7 @@
 
 ## projects
 - project_id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
-- project_name — TEXT, NOT NULL  
+- project_name — VARCHAR(255), NOT NULL  
 - description — TEXT  
 - start_date — DATE  
 - end_date — DATE  
@@ -35,7 +35,7 @@
 
 ## tasks
 - task_id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
-- task_name — TEXT, NOT NULL  
+- task_name — VARCHAR(255), NOT NULL  
 - description — TEXT  
 - due_date — DATE  
 - status_id — BIGINT NOT NULL REFERENCES statuses(status_id)  
@@ -62,7 +62,7 @@
 ## files
 - file_id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
 - task_id — BIGINT NOT NULL, REFERENCES tasks(task_id) ON DELETE CASCADE  
-- file_name — TEXT, NOT NULL  
+- file_name — VARCHAR(255), NOT NULL  
 - file_path — TEXT, NOT NULL  
 - uploaded_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()
 
@@ -72,7 +72,7 @@
 
 ## teams
 - team_id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
-- team_name — TEXT, NOT NULL  
+- team_name — VARCHAR(128), NOT NULL  
 - created_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()  
 - owner_id — BIGINT, REFERENCES users(id) ON DELETE SET NULL
 
@@ -84,7 +84,7 @@
 - team_member_id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
 - team_id — BIGINT NOT NULL, REFERENCES teams(team_id) ON DELETE CASCADE  
 - user_id — BIGINT NOT NULL, REFERENCES users(id) ON DELETE CASCADE  
-- role — TEXT, NOT NULL, DEFAULT 'member'
+- role — VARCHAR(32), NOT NULL, DEFAULT 'member'
 
 Примечание: таблица связи пользователей и команд.
 
@@ -105,8 +105,8 @@
 
 ## priorities
 - priority_id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
-- priority_level — TEXT, NOT NULL, UNIQUE  
-- color_code — TEXT
+- priority_level — VARCHAR(32), NOT NULL, UNIQUE  
+- color_code — VARCHAR(32), NOT NULL, UNIQUE
 
 Примечание: справочная таблица уровней приоритетов.
 
@@ -127,7 +127,7 @@
 - dependency_id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
 - task_id — BIGINT NOT NULL, REFERENCES tasks(task_id) ON DELETE CASCADE  
 - dependent_task_id — BIGINT NOT NULL, REFERENCES tasks(task_id) ON DELETE CASCADE  
-- dependency_type — TEXT, NOT NULL  
+- dependency_type — VARCHAR(32), NOT NULL  
 - UNIQUE (task_id, dependent_task_id)
 
 Примечание: моделирует зависимости между задачами (направленные связи).
@@ -136,7 +136,7 @@
 
 ## statuses
 - status_id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
-- status — TEXT, NOT NULL, UNIQUE
+- status — VARCHAR(32), NOT NULL, UNIQUE
 
 Примечание: справочная таблица статусов.
 
