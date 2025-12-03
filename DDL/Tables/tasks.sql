@@ -1,6 +1,6 @@
 CREATE TABLE tasks (
-    task_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    task_name VARCHAR(255) NOT NULL,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
     description TEXT,
     due_date DATE,
     status_id BIGINT NOT NULL REFERENCES statuses(status_id),
