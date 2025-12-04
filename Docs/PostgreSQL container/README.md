@@ -2,11 +2,17 @@
 
 База данных запускается в контейнере Docker. Для этого необходимо сделать следующее:
 Скачать образ postgres:
+
 ![load_image](/Docs/PostgreSQL%20container/pics/Download_container.png)
+
 Запустить контейнер:
+
 ![run_container](/Docs/PostgreSQL%20container/pics/Run_container.png)
+
 Подключить клиент DBeaver:
+
 ![connect_db](/Docs/PostgreSQL%20container/pics/Connect_db.png)
+
 Создать тестовую таблицу test_table, выполнив скрипт 
 ```
 create table test_table(id int, description text)
