@@ -1,3 +1,5 @@
+SET search_path = proj_manager, PUBLIC;
+
 -- Create enums
 CREATE TYPE change_type AS ENUM ('status', 'name', 'description', 'comment', 'assignment', 'due_date', 'priority');
 CREATE TYPE dependency_type AS ENUM ('blocks', 'relates_to', 'duplicates', 'predecessor_of', 'successor_of');
@@ -29,7 +31,7 @@ CREATE TABLE projects (
     description TEXT,
     start_date DATE,
     end_date DATE,
-    status_id BIGINT NOT NULL REFERENCES statuses(status_id),
+    status_id BIGINT NOT NULL REFERENCES statuses(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     owner_id BIGINT NOT NULL REFERENCES users(id)
 );
@@ -39,16 +41,16 @@ CREATE TABLE tasks (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     due_date DATE,
-    status_id BIGINT NOT NULL REFERENCES statuses(status_id),
-    priority_id BIGINT REFERENCES priorities(priority_id),
-    project_id BIGINT NOT NULL REFERENCES projects(project_id) ON DELETE CASCADE,
+    status_id BIGINT NOT NULL REFERENCES statuses(id),
+    priority_id BIGINT REFERENCES priorities(id),
+    project_id BIGINT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     assigned_to BIGINT REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 CREATE TABLE files (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    task_id BIGINT NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+    task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
     file_name VARCHAR(255) NOT NULL,
     file_path TEXT NOT NULL,
     uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT now()
@@ -56,7 +58,7 @@ CREATE TABLE files (
 
 CREATE TABLE comments (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    task_id BIGINT NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+    task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
     user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
@@ -64,7 +66,7 @@ CREATE TABLE comments (
 
 CREATE TABLE log_history (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    task_id BIGINT NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+    task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
     changed_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
     change_type change_type NOT NULL,
     old_value TEXT,
@@ -74,8 +76,8 @@ CREATE TABLE log_history (
 
 CREATE TABLE task_dependencies (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    task_id BIGINT NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
-    dependent_task_id BIGINT NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+    task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+    dependent_task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
     dependency_type dependency_type NOT NULL,
     UNIQUE (task_id, dependent_task_id)
 );
@@ -89,14 +91,14 @@ CREATE TABLE teams (
 
 CREATE TABLE team_members (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    team_id BIGINT NOT NULL REFERENCES teams(team_id) ON DELETE CASCADE,
+    team_id BIGINT NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     role team_role NOT NULL DEFAULT 'member'
 );
 
 CREATE TABLE time_tracking (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    task_id BIGINT NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+    task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
     user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
     hours_spent NUMERIC(6,2) NOT NULL CHECK (hours_spent >= 0),
     entry_date DATE NOT NULL DEFAULT CURRENT_DATE
