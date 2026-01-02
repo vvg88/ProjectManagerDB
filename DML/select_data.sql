@@ -1,3 +1,5 @@
+SET search_path = proj_manager, PUBLIC;
+
 -- Project information
 SELECT p.name, p.description, p.start_date, p.end_date, u.username AS owner_username, s.name AS status_name FROM projects p
 JOIN users u ON p.owner_id = u.id

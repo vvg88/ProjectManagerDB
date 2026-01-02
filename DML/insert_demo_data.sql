@@ -1,5 +1,7 @@
+SET search_path = proj_manager, PUBLIC;
+
 -- Create statuses
-INSERT INTO proj_manager.statuses (status) VALUES
+INSERT INTO statuses (status) VALUES
   ('planned'),
   ('active'),
   ('completed'),
@@ -7,8 +9,15 @@ INSERT INTO proj_manager.statuses (status) VALUES
   ('cancelled')
 ON CONFLICT (status) DO NOTHING;
 
+-- Create priorities
+INSERT INTO priorities (priority_level, color_code) VALUES
+  ('low', '#00FF00'),
+  ('normal', '#FFFF00'),
+  ('high', '#FFA500'),
+  ('urgent', '#FF0000')
+
 -- Create demo users. DO NOT USE md5 in production; this is just for demo purposes.
-INSERT INTO proj_manager.users (username, email, password_hash) VALUES
+INSERT INTO users (username, email, password_hash) VALUES
   ('alice', 'alice@example.com', md5('demo_hash_alice')),
   ('bob', 'bob@example.com', md5('demo_hash_bob')),
   ('carol', 'carol@example.com', md5('demo_hash_carol')),
@@ -24,7 +33,7 @@ INSERT INTO proj_manager.users (username, email, password_hash) VALUES
 ON CONFLICT (username) DO NOTHING;
 
 -- Insert demo projects
-INSERT INTO proj_manager.projects (name, description, start_date, end_date, status_id, owner_id) VALUES
+INSERT INTO projects (name, description, start_date, end_date, status_id, owner_id) VALUES
   ('Frontend App', 'Develop frontend application', '2025-12-01', '2025-07-30',
     (SELECT id FROM statuses WHERE status = 'active'),
     (SELECT id FROM users WHERE username = 'bob')),
@@ -45,12 +54,12 @@ INSERT INTO proj_manager.projects (name, description, start_date, end_date, stat
     (SELECT id FROM users WHERE username = 'alice'));
 
 -- Create demo teams
-INSERT INTO proj_manager.teams (team_name, owner_id) VALUES
+INSERT INTO teams (team_name, owner_id) VALUES
   ('Marketing', (SELECT id FROM users WHERE username = 'alice')),
   ('Frontend', (SELECT id FROM users WHERE username = 'bob')),
   ('Backend', (SELECT id FROM users WHERE username = 'carol'))
 
-INSERT INTO proj_manager.team_members (team_id, user_id, role) VALUES
+INSERT INTO team_members (team_id, user_id, role) VALUES
   ((SELECT id FROM teams WHERE team_name = 'Marketing'), (SELECT id FROM users WHERE username = 'alice'), 'lead'),
   ((SELECT id FROM teams WHERE team_name = 'Marketing'), (SELECT id FROM users WHERE username = 'dave'), 'analyst'),
   ((SELECT id FROM teams WHERE team_name = 'Marketing'), (SELECT id FROM users WHERE username = 'eve'), 'member'),
@@ -63,22 +72,22 @@ INSERT INTO proj_manager.team_members (team_id, user_id, role) VALUES
   ((SELECT id FROM teams WHERE team_name = 'Backend'), (SELECT id FROM users WHERE username = 'john'), 'developer'),
   ((SELECT id FROM teams WHERE team_name = 'Backend'), (SELECT id FROM users WHERE username = 'max'), 'devops')
 
-INSERT INTO proj_manager.tasks (name, description, due_date, status_id, project_id, assigned_to)
+INSERT INTO tasks (name, description, due_date, status_id, project_id, assigned_to)
 SELECT
   'Design UI components',
   'Create and document core UI components and design system.',
   '2026-01-15',
-  (SELECT id FROM proj_manager.statuses WHERE status = 'active' LIMIT 1),
-  (SELECT id FROM proj_manager.projects WHERE name = 'Frontend App' LIMIT 1),
-  (SELECT id FROM proj_manager.users WHERE username = 'frank' LIMIT 1)
+  (SELECT id FROM statuses WHERE status = 'active' LIMIT 1),
+  (SELECT id FROM projects WHERE name = 'Frontend App' LIMIT 1),
+  (SELECT id FROM users WHERE username = 'frank' LIMIT 1)
 
-INSERT INTO proj_manager.tasks (name, description, due_date, status_id, project_id, assigned_to)
+INSERT INTO tasks (name, description, due_date, status_id, project_id, assigned_to)
 SELECT
   'Decompose december features',
   'Break down December roadmap features into smaller tasks, estimate effort and assign owners.',
   '2025-12-15',
-  (SELECT id FROM proj_manager.statuses WHERE status = 'completed' LIMIT 1),
-  (SELECT id FROM proj_manager.projects WHERE name = 'Frontend App' LIMIT 1),
-  (SELECT id FROM proj_manager.users WHERE username = 'bob' LIMIT 1)
+  (SELECT id FROM statuses WHERE status = 'completed' LIMIT 1),
+  (SELECT id FROM projects WHERE name = 'Frontend App' LIMIT 1),
+  (SELECT id FROM users WHERE username = 'bob' LIMIT 1)
 
   -- To be continued
