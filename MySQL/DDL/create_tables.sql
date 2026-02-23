@@ -1,11 +1,6 @@
 -- Active: 1771063096281@@127.0.0.1@3306@project_manager_db
 USE project_manager_db;
 
--- Create enums
--- CREATE TYPE change_type AS ENUM ('status', 'name', 'description', 'comment', 'assignment', 'due_date', 'priority');
--- CREATE TYPE dependency_type AS ENUM ('blocks', 'relates_to', 'duplicates', 'predecessor_of', 'successor_of');
--- CREATE TYPE team_role AS ENUM ('lead', 'developer', 'tester', 'devops', 'manager', 'analyst', 'member');
-
 -- Create tables
 CREATE TABLE priorities (
     id SERIAL PRIMARY KEY,
