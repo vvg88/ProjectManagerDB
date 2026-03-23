@@ -1,5 +1,3 @@
--- Active: 1771063096281@@127.0.0.1@3306@sales_db
--- Active: 1771063096281@@127.0.0.1@3306@mysql
 CREATE DATABASE sales_db;
 
 CREATE TABLE stores (
@@ -71,4 +69,35 @@ SELECT store_id,
        SUM(total_sales) OVER (PARTITION BY store_id ORDER BY total_sales) AS total_sales_growing
 FROM sales_in_month
 ORDER BY store_id;
+
+-- Пример запроса с оконной функцией для расчёта скользящего среднего продаж за 7 дней для магазина с наибольшими продажами
+WITH store_total_sales AS (
+    SELECT store_id,
+           SUM(sale_amount) AS total_sales
+    FROM sales
+    WHERE date >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+    GROUP BY store_id
+    ORDER BY total_sales DESC
+    LIMIT 1
+),
+sales_in_day AS (
+    SELECT store_id,
+        DATE(date) AS sale_date,
+        SUM(sale_amount) AS total_sales_in_day
+    FROM sales
+    WHERE date >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+    AND store_id = (SELECT store_id FROM store_total_sales)
+    GROUP BY store_id, DATE(date)
+)
+SELECT 
+    store_id,
+    sale_date,
+    total_sales_in_day,
+    AVG(total_sales_in_day) OVER (
+        PARTITION BY store_id 
+        ORDER BY sale_date 
+        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+    ) AS moving_avg_7day
+FROM sales_in_day
+ORDER BY store_id, sale_date;
 

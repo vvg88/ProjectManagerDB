@@ -1,4 +1,5 @@
 ``` sql
+-- Пример запроса с оконной функцией для анализа роста продаж по месяцам для каждого магазина
 WITH sales_in_month AS (
     SELECT store_id,
            DATE_FORMAT(date, '%Y-%m') AS month,
@@ -13,6 +14,11 @@ SELECT store_id,
 FROM sales_in_month
 ORDER BY store_id;
 ```
+
+<details>
+
+<summary>Result</summary>
+
 | store_id | month | total_sales | total_sales_growing |
 | -------- | ----- | ----------- | ------------------- |
 |       1 | 2024-03 |   35532.64 |           35532.64 |
@@ -266,3 +272,69 @@ ORDER BY store_id;
 |      10 | 2024-10 |   12680.35 |          153847.96 |
 |      10 | 2025-08 |   12698.66 |          166546.62 |
 
+</details>
+
+
+``` sql
+-- Пример запроса с оконной функцией для расчёта скользящего среднего продаж за 7 дней для магазина с наибольшими продажами
+WITH store_total_sales AS (
+    SELECT store_id,
+           SUM(sale_amount) AS total_sales
+    FROM sales
+    WHERE date >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+    GROUP BY store_id
+    ORDER BY total_sales DESC
+    LIMIT 1
+),
+sales_in_day AS (
+    SELECT store_id,
+        DATE(date) AS sale_date,
+        SUM(sale_amount) AS total_sales_in_day
+    FROM sales
+    WHERE date >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+    AND store_id = (SELECT store_id FROM store_total_sales)
+    GROUP BY store_id, DATE(date)
+)
+SELECT 
+    store_id,
+    sale_date,
+    total_sales_in_day,
+    AVG(total_sales_in_day) OVER (
+        PARTITION BY store_id 
+        ORDER BY sale_date 
+        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+    ) AS moving_avg_7day
+FROM sales_in_day
+ORDER BY store_id, sale_date;
+```
+
+| store_id | sale_date  | total_sales_in_day | moving_avg_7day |
+|----------|------------|--------------------|-----------------|
+|        1 | 2026-02-24 |           7682.46 |    7682.460000  |
+|        1 | 2026-02-25 |           4444.43 |    6063.445000  |
+|        1 | 2026-02-26 |           6949.53 |    6358.806667  |
+|        1 | 2026-02-27 |           6848.02 |    6481.110000  |
+|        1 | 2026-02-28 |           5445.50 |    6273.988000  |
+|        1 | 2026-03-01 |           2495.68 |    5644.270000  |
+|        1 | 2026-03-02 |           5824.60 |    5670.031429  |
+|        1 | 2026-03-03 |           2902.22 |    4987.140000  |
+|        1 | 2026-03-04 |           5799.46 |    5180.715714  |
+|        1 | 2026-03-05 |           5332.28 |    4949.680000  |
+|        1 | 2026-03-06 |           7030.08 |    4975.688571  |
+|        1 | 2026-03-07 |           1266.37 |    4378.670000  |
+|        1 | 2026-03-08 |           3660.35 |    4545.051429  |
+|        1 | 2026-03-09 |           3809.61 |    4257.195714  |
+|        1 | 2026-03-10 |           4337.75 |    4462.271429  |
+|        1 | 2026-03-11 |           2757.91 |    4027.764286  |
+|        1 | 2026-03-12 |           6552.95 |    4202.145714  |
+|        1 | 2026-03-13 |           5529.04 |    3987.711429  |
+|        1 | 2026-03-14 |           5314.78 |    4566.055714  |
+|        1 | 2026-03-15 |           3921.97 |    4603.430000  |
+|        1 | 2026-03-16 |           7308.43 |    5103.261429  |
+|        1 | 2026-03-17 |           6461.81 |    5406.698571  |
+|        1 | 2026-03-18 |           6612.64 |    5957.374286  |
+|        1 | 2026-03-19 |           3514.20 |    5523.267143  |
+|        1 | 2026-03-20 |           5456.77 |    5512.942857  |
+|        1 | 2026-03-21 |           6370.22 |    5663.720000  |
+|        1 | 2026-03-22 |           4868.09 |    5798.880000  |
+|        1 | 2026-03-23 |           3533.68 |    5259.630000  |
