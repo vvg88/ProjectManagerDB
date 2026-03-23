@@ -23,27 +23,27 @@ BEGIN
     DECLARE sale_date TIMESTAMP;
     DECLARE amount DECIMAL(10,2);
 
-    -- Insert stores
+    -- Вставляем магазины
     SET i = 1;
     WHILE i <= store_count DO
         INSERT INTO stores (address) VALUES (CONCAT('Store Address ', i));
         SET i = i + 1;
     END WHILE;
 
-    -- Insert sales
+    -- Вставляем продажи
     SET i = 1;
     WHILE i <= sales_count DO
-        -- Choose store: 70% chance for store 1
+        -- 70% продаж в магазине 1, остальные 30% распределены между магазинами 2-10
         IF RAND() < 0.7 THEN
             SET s_id = 1;
         ELSE
             SET s_id = FLOOR(RAND() * 9) + 2; -- 2 to 10
         END IF;
 
-        -- Random date in last 2 years (approx 730 days)
+        -- Случайная дата продажи в пределах последних 2 лет
         SET sale_date = DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 730) DAY);
 
-        -- Random amount between 1.00 and 1000.00
+        -- Случайная сумма продаж между 1.00 и 1000.00
         SET amount = ROUND(RAND() * 999 + 1, 2);
 
         INSERT INTO sales (store_id, date, sale_amount) VALUES (s_id, sale_date, amount);
