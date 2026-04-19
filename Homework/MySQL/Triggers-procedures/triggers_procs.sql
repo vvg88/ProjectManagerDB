@@ -55,7 +55,7 @@ CREATE USER IF NOT EXISTS 'client'@'localhost' IDENTIFIED BY 'client_pwd';
 CREATE USER IF NOT EXISTS 'manager'@'localhost' IDENTIFIED BY 'manager_pwd';
 
 GRANT EXECUTE ON PROCEDURE store_db.GetProducts TO 'client'@'localhost';
-GRANT SELECT ON store_db.* TO 'manager'@'localhost';
+GRANT EXECUTE ON PROCEDURE store_db.GetSales TO 'manager'@'localhost';
 
 FLUSH PRIVILEGES;
 
@@ -101,3 +101,56 @@ END$$
 DELIMITER ;
 
 CALL GetProducts(NULL, NULL, 'rating', 10, 1, @count);
+
+DELIMITER $$
+CREATE PROCEDURE GetSales(
+    IN start_date DATETIME,
+    IN end_date DATETIME,
+    IN group_by VARCHAR(10),
+    OUT total_sales DECIMAL(10, 2))
+BEGIN
+    -- Вычисляем общую сумму продаж за указанный период
+    SELECT SUM(sale_price * quantity) INTO total_sales
+    FROM sales
+    WHERE sale_date BETWEEN start_date AND end_date;
+
+    -- Создание временной таблицы для объединения данных из sales и products
+    CREATE TEMPORARY TABLE temp_sales AS
+    SELECT s.product_name, s.quantity, s.sale_date, s.sale_price, p.category FROM sales s
+    JOIN products p ON s.product_name = p.name
+    WHERE sale_date BETWEEN start_date AND end_date;
+    
+    -- Группировка данных по дате, продукту или категории
+    IF (group_by = 'date') THEN
+        SELECT 
+            DATE(sale_date) AS sale_day,
+            SUM(sale_price * quantity) AS daily_sales,
+            SUM(quantity) AS total_quantity
+        FROM temp_sales
+        GROUP BY sale_day
+        ORDER BY sale_day;
+    ELSEIF (group_by = 'product') THEN
+        SELECT
+            product_name,
+            SUM(sale_price * quantity) AS product_sales,
+            SUM(quantity) AS total_quantity
+        FROM temp_sales
+        GROUP BY product_name
+        ORDER BY product_sales DESC;
+    ELSEIF (group_by = 'category') THEN
+        SELECT
+            category,
+            SUM(sale_price * quantity) AS category_sales,
+            SUM(quantity) AS total_quantity
+        FROM temp_sales
+        GROUP BY category
+        ORDER BY category_sales DESC;
+    ELSE
+        SELECT * FROM temp_sales;
+    END IF;
+
+    DROP TEMPORARY TABLE temp_sales;
+END$$
+DELIMITER ;
+
+CALL GetSales('2026-04-15 00:00:00', '2026-04-18 23:59:59', 'category', @total_sales);
