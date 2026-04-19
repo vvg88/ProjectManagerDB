@@ -1,4 +1,3 @@
--- Active: 1776510434773@@127.0.0.1@3306@store_db
 CREATE DATABASE store_db;
 USE store_db;
 
@@ -15,16 +14,16 @@ CREATE TABLE products (
 
 -- Вставляем данные в таблицу products
 INSERT INTO products (name, category, price, rating, status) VALUES
-('Laptop', 'Electronics', 1200, 4, 'instock'),
-('Smartphone', 'Electronics', 800, 5, 'instock'),
-('Headphones', 'Electronics', 150, 3, 'outofstock'),
-('Coffee Maker', 'Home Appliances', 100, 4, 'instock'),
-('Blender', 'Home Appliances', 80, 2, 'instock'),
-('Vacuum Cleaner', 'Home Appliances', 200, 5, 'outofstock'),
-('T-Shirt', 'Clothing', 20, 4, 'instock'),
-('Jeans', 'Clothing', 50, 3, 'instock'),
-('Jacket', 'Clothing', 100, 5, 'outofstock'),
-('Sneakers', 'Footwear', 70, 4, 'instock');
+    ('Laptop', 'Electronics', 1200, 4, 'instock'),
+    ('Smartphone', 'Electronics', 800, 5, 'instock'),
+    ('Headphones', 'Electronics', 150, 3, 'outofstock'),
+    ('Coffee Maker', 'Home Appliances', 100, 4, 'instock'),
+    ('Blender', 'Home Appliances', 80, 2, 'instock'),
+    ('Vacuum Cleaner', 'Home Appliances', 200, 5, 'outofstock'),
+    ('T-Shirt', 'Clothing', 20, 4, 'instock'),
+    ('Jeans', 'Clothing', 50, 3, 'instock'),
+    ('Jacket', 'Clothing', 100, 5, 'outofstock'),
+    ('Sneakers', 'Footwear', 70, 4, 'instock');
 
 -- Создание таблицы sales
 DROP TABLE IF EXISTS sales;
@@ -39,16 +38,16 @@ CREATE TABLE sales (
 
 -- Вставка демонстрационных данных в таблицу sales
 INSERT INTO sales (product_name, quantity, sale_price, sale_date) VALUES
-('Laptop', 2, 1200.00, '2026-04-15 10:30:00'),
-('Smartphone', 5, 800.00, '2026-04-15 11:45:00'),
-('Coffee Maker', 3, 100.00, '2026-04-16 09:15:00'),
-('T-Shirt', 10, 20.00, '2026-04-16 14:20:00'),
-('Jeans', 4, 50.00, '2026-04-16 15:50:00'),
-('Sneakers', 2, 70.00, '2026-04-17 08:30:00'),
-('Blender', 1, 80.00, '2026-04-17 10:00:00'),
-('Laptop', 1, 1200.00, '2026-04-17 13:25:00'),
-('Headphones', 6, 150.00, '2026-04-18 09:00:00'),
-('Jacket', 3, 100.00, '2026-04-18 11:30:00');
+    ('Laptop', 2, 1200.00, '2026-04-15 10:30:00'),
+    ('Smartphone', 5, 800.00, '2026-04-15 11:45:00'),
+    ('Coffee Maker', 3, 100.00, '2026-04-16 09:15:00'),
+    ('T-Shirt', 10, 20.00, '2026-04-16 14:20:00'),
+    ('Jeans', 4, 50.00, '2026-04-16 15:50:00'),
+    ('Sneakers', 2, 70.00, '2026-04-17 08:30:00'),
+    ('Blender', 1, 80.00, '2026-04-17 10:00:00'),
+    ('Laptop', 1, 1200.00, '2026-04-17 13:25:00'),
+    ('Headphones', 6, 150.00, '2026-04-18 09:00:00'),
+    ('Jacket', 3, 100.00, '2026-04-18 11:30:00');
 
 -- Создание пользователей и назначение прав доступа
 CREATE USER IF NOT EXISTS 'client'@'localhost' IDENTIFIED BY 'client_pwd';
