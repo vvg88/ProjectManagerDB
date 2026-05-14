@@ -8,8 +8,7 @@ CREATE TYPE team_role AS ENUM ('lead', 'developer', 'tester', 'devops', 'manager
 -- Create tables
 CREATE TABLE priorities (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    priority_level VARCHAR(32) NOT NULL UNIQUE,
-    color_code VARCHAR(32) NOT NULL UNIQUE
+    priority_level VARCHAR(32) NOT NULL UNIQUE
 );
 
 CREATE TABLE statuses (
