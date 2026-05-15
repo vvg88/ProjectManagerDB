@@ -232,3 +232,23 @@ BEGIN
 END;
 $$;
 
+-- Time tracking
+-- Хранимая процедура для добавления записи о затраченном времени
+CREATE OR REPLACE PROCEDURE add_time_entry(
+    p_task_id BIGINT,
+    p_user_name VARCHAR(128),
+    p_entry_date DATE,
+    p_hours_spent NUMERIC(5,2)
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO time_entries (task_id, user_id, entry_date, hours_spent)
+    VALUES (
+        p_task_id,
+        (SELECT id FROM users WHERE username = p_user_name),
+        p_entry_date,
+        p_hours_spent
+    );
+END;
+$$;
