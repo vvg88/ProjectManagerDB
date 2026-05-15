@@ -172,6 +172,36 @@ BEGIN
 END;
 $$;
 
+-- Добавление комментария к задаче с логированием в log_history
+CREATE OR REPLACE PROCEDURE add_comment_to_task(
+    p_task_id BIGINT,
+    p_user_name VARCHAR(128),
+    p_comment_content TEXT
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_user_id BIGINT;
+BEGIN
+    -- Получаем ID пользователя, который добавляет комментарий
+    SELECT id INTO v_user_id FROM users WHERE username = p_user_name;
+    
+    IF v_user_id IS NULL THEN
+        RAISE EXCEPTION 'User % does not exist', p_user_name;
+    END IF;
+
+    -- Добавляем комментарий к задаче
+    INSERT INTO comments (task_id, user_id, content)
+    VALUES (p_task_id, v_user_id, p_comment_content);
+
+    -- Логируем добавление комментария в log_history
+    INSERT INTO log_history (task_id, changed_by, change_type, old_value, new_value)
+    VALUES (p_task_id, v_user_id, 'comment'::change_type, NULL, p_comment_content);
+    
+    RAISE NOTICE 'Comment added to task % and logged.', p_task_id;
+END;
+$$;
+
 -- Хранимая процедура для установки зависимости между задачами
 CREATE OR REPLACE PROCEDURE set_task_dependency(
     p_task_id BIGINT,
