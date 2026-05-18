@@ -1,45 +1,46 @@
--- Users indexes
+-- Users index
+-- Уникальный индекс для быстрого поиска по имени пользователя
 CREATE INDEX idx_users_username ON users(username);
 
 -- Tasks indexes
--- GIN index for full-text search on task name
+-- GIN index для полнотекстового поиска по имени задачи
 CREATE INDEX idx_tasks_task_name_gin ON tasks USING gin (to_tsvector(task_name));
 
--- GIN index for full-text search on task description
+-- GIN index для полнотекстового поиска по описанию задачи
 CREATE INDEX idx_tasks_task_description_gin ON tasks USING gin (to_tsvector(task_description));
 
--- Composite partial index to search for tasks assigned to a user in a status == 'completed' (status_id = 3)
-CREATE INDEX idx_tasks_assigned_to_status ON tasks(assigned_to, status_id) WHERE status_id = 3;
+-- Составной индекс для поиска задач по назначенному пользователю и сортировке или группировки по статусу
+CREATE INDEX idx_tasks_assigned_to_status ON tasks(assigned_to, status_id);
 
--- Composite index to search for tasks of a project and group (order) by status
+-- Составной индекс для поиска задач по проекту и статусу
 CREATE INDEX idx_tasks_project_id_status ON tasks(project_id, status_id);
 
--- Log_history indexes
--- Search log history records of a specific task
+-- Log_history индекс
+-- Поиск истории изменений по task_id
 CREATE INDEX idx_log_history_task_id ON log_history(task_id);
 
--- Comments indexes
--- Search comments by task_id and order by created_at
+-- Comments индекс
+-- Поиск комментариев по task_id и сортировка по created_at
 CREATE INDEX idx_comments_task_id_created_at ON comments(task_id, created_at);
 
--- Files indexes
--- Search files by task_id
+-- Files индекс
+-- Поиск файлов по task_id
 CREATE INDEX idx_files_task_id ON files(task_id);
 
--- Task_dependencies indexes
--- Search dependent tasks by task_id
+-- Task_dependencies индекс
+-- Поиск зависимых задач по task_id
 CREATE INDEX idx_task_dependencies_task_id ON task_dependencies(task_id);
 
--- Team_members indexes
--- Search users in a team
+-- Team_members индекс
+-- Поиск пользователей в команде
 CREATE INDEX idx_team_members_team_id ON team_members(team_id);
 
--- Time_tracking indexes
--- Search time tracking entries by task_id and user_id
+-- Time_tracking индексы
+-- Поиск записей по task_id и user_id с включением полей hours_spent и entry_date
 CREATE INDEX idx_time_tracking_task_id_user_id ON time_tracking(task_id, user_id) INCLUDE (hours_spent, entry_date);
 
--- Search time tracking entries for task by date
+-- Поиск записей по task_id и entry_date 
 CREATE INDEX idx_time_tracking_task_id_entry_date ON time_tracking(task_id, entry_date) INCLUDE (hours_spent);
 
--- Search time tracking entries for user by date
+-- Поиск записей по user_id и entry_date для анализа активности пользователя
 CREATE INDEX idx_time_tracking_user_id_entry_date ON time_tracking(user_id, entry_date) INCLUDE (task_id, hours_spent);
