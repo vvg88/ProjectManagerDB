@@ -49,7 +49,7 @@ CREATE OR REPLACE PROCEDURE create_task(
     p_status VARCHAR(32),
     p_priority VARCHAR(32),
     p_project_id BIGINT,
-    p_assigned_to VARCHAR(255) DEFAULT NULL
+    p_user_name VARCHAR(255) DEFAULT NULL
 )
 LANGUAGE plpgsql
 AS $$
@@ -62,7 +62,7 @@ BEGIN
         (SELECT id FROM statuses WHERE status = p_status),
         (SELECT id FROM priorities WHERE priority_level = p_priority),
         p_project_id,
-        (SELECT id FROM users WHERE username = p_assigned_to)
+        (SELECT id FROM users WHERE username = p_user_name)
     );
 END;
 $$;
@@ -70,13 +70,13 @@ $$;
 -- Хранимая процедура для обновления задачи с логированием изменений в log_history
 CREATE OR REPLACE PROCEDURE update_task_with_log(
     p_task_id BIGINT,
+    p_changed_by VARCHAR(255),
     p_name VARCHAR(255) DEFAULT NULL,
     p_description TEXT DEFAULT NULL,
     p_due_date DATE DEFAULT NULL,
     p_status VARCHAR(32) DEFAULT NULL,
     p_priority VARCHAR(32) DEFAULT NULL,
-    p_assigned_to VARCHAR(255) DEFAULT NULL,
-    p_changed_by VARCHAR(255)
+    p_assigned_to VARCHAR(255) DEFAULT NULL
 )
 LANGUAGE plpgsql
 AS $$
