@@ -4,10 +4,10 @@ CREATE INDEX idx_users_username ON users(username);
 
 -- Tasks indexes
 -- GIN index для полнотекстового поиска по имени задачи
-CREATE INDEX idx_tasks_task_name_gin ON tasks USING gin (to_tsvector(task_name));
+CREATE INDEX idx_tasks_task_name_gin ON tasks USING gin (to_tsvector(name));
 
 -- GIN index для полнотекстового поиска по описанию задачи
-CREATE INDEX idx_tasks_task_description_gin ON tasks USING gin (to_tsvector(task_description));
+CREATE INDEX idx_tasks_task_description_gin ON tasks USING gin (to_tsvector(description));
 
 -- Составной индекс для поиска задач по назначенному пользователю и сортировке или группировки по статусу
 CREATE INDEX idx_tasks_assigned_to_status ON tasks(assigned_to, status_id);
@@ -26,6 +26,9 @@ CREATE INDEX idx_comments_task_id_created_at ON comments(task_id, created_at);
 -- Files индекс
 -- Поиск файлов по task_id
 CREATE INDEX idx_files_task_id ON files(task_id);
+
+-- Индекс для поиска файлов по типу
+CREATE INDEX idx_files_file_type ON files(file_type);
 
 -- Task_dependencies индекс
 -- Поиск зависимых задач по task_id

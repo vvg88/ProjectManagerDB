@@ -84,7 +84,7 @@
 - task_id — BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE  
 - file_name — VARCHAR(255), NOT NULL  
 - file_path — TEXT, NOT NULL  
-- uploaded_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()
+- created_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()
 
 Примечание: хранит информацию о файлах, прикреплённых к задачам. Удаление задачи удаляет файлы, приложенные к ней.
 
