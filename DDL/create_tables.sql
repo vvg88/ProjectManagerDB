@@ -43,9 +43,9 @@ CREATE TABLE tasks (
     description TEXT,
     due_date DATE,
     status_id BIGINT NOT NULL REFERENCES statuses(id),
-    priority_id BIGINT REFERENCES priorities(id),
+    priority_id BIGINT NOT NULL REFERENCES priorities(id),
     project_id BIGINT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    assigned_to BIGINT REFERENCES users(id),
+    assigned_to BIGINT NOT NULL REFERENCES users(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
@@ -61,7 +61,7 @@ CREATE TABLE files (
 CREATE TABLE comments (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
-    user_id BIGINT REFERENCES users(id),
+    user_id BIGINT NOT NULL REFERENCES users(id),
     content TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
@@ -69,7 +69,7 @@ CREATE TABLE comments (
 CREATE TABLE log_history (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
-    changed_by BIGINT REFERENCES users(id),
+    changed_by BIGINT NOT NULL REFERENCES users(id),
     change_type change_type NOT NULL,
     old_value TEXT,
     new_value TEXT,
@@ -88,7 +88,7 @@ CREATE TABLE teams (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     team_name VARCHAR(128) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-    owner_id BIGINT REFERENCES users(id)
+    owner_id BIGINT NOT NULL REFERENCES users(id)
 );
 
 CREATE TABLE team_members (
@@ -101,7 +101,7 @@ CREATE TABLE team_members (
 CREATE TABLE time_tracking (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
-    user_id BIGINT REFERENCES users(id),
+    user_id BIGINT NOT NULL REFERENCES users(id),
     hours_spent NUMERIC(6,2) NOT NULL CHECK (hours_spent >= 0 AND hours_spent <= 16),
     entry_date DATE NOT NULL DEFAULT CURRENT_DATE
 );
