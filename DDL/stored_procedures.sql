@@ -65,12 +65,12 @@ $$;
 -- Хранимая процедура для обновления проекта
 CREATE OR REPLACE PROCEDURE update_project(
     p_project_id BIGINT,
+    OUT p_error_code INT,
     p_name VARCHAR(255) DEFAULT NULL,
     p_description TEXT DEFAULT NULL,
     p_start_date DATE DEFAULT NULL,
     p_end_date DATE DEFAULT NULL,
-    p_status VARCHAR(32) DEFAULT NULL,
-    OUT p_error_code INT
+    p_status VARCHAR(32) DEFAULT NULL
 )
 LANGUAGE plpgsql
 AS $$
@@ -122,8 +122,8 @@ CREATE OR REPLACE PROCEDURE create_task(
     p_status VARCHAR(32),
     p_priority VARCHAR(32),
     p_project_id BIGINT,
-    p_user_name VARCHAR(255) DEFAULT NULL,
-    OUT p_error_code INT
+    OUT p_error_code INT,
+    p_user_name VARCHAR(255) DEFAULT NULL
 )
 LANGUAGE plpgsql
 AS $$
@@ -204,13 +204,13 @@ $$;
 CREATE OR REPLACE PROCEDURE update_task_with_log(
     p_task_id BIGINT,
     p_changed_by VARCHAR(255),
+    OUT p_error_code INT,
     p_name VARCHAR(255) DEFAULT NULL,
     p_description TEXT DEFAULT NULL,
     p_due_date DATE DEFAULT NULL,
     p_status VARCHAR(32) DEFAULT NULL,
     p_priority VARCHAR(32) DEFAULT NULL,
-    p_assigned_to VARCHAR(255) DEFAULT NULL,
-    OUT p_error_code INT
+    p_assigned_to VARCHAR(255) DEFAULT NULL
 )
 LANGUAGE plpgsql
 AS $$
@@ -510,7 +510,7 @@ BEGIN
     END IF;
 
     INSERT INTO teams (team_name, owner_id)
-    VALUES (p_team_name, p_owner_id)
+    VALUES (p_team_name, v_owner_id)
     RETURNING id INTO v_inserted_team_id;
 
     RAISE NOTICE 'Team created successfully with id: %', v_inserted_team_id;
@@ -529,8 +529,8 @@ $$;
 CREATE OR REPLACE PROCEDURE add_team_member(
     p_team_name VARCHAR(128),
     p_user_name VARCHAR(128),
-    p_role VARCHAR(32) DEFAULT 'member',
-    OUT p_error_code INT
+    OUT p_error_code INT,
+    p_role VARCHAR(32) DEFAULT 'member'
 )
 LANGUAGE plpgsql
 AS $$
