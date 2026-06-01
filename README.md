@@ -50,6 +50,8 @@
 - created_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()  
 - owner_id — BIGINT NOT NULL REFERENCES users(id)
 
+![projects](/Docs/pics/projects_table.png)
+
 Примечание: хранит проекты. owner_id ссылается на users, поле status_id ссылается на таблицу statuses.
 
 ---
@@ -64,6 +66,8 @@
 - project_id — BIGINT NOT NULL REFERENCES projects(id) ON DELETE CASCADE  
 - assigned_to — BIGINT REFERENCES users(id)  
 - created_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()
+
+![tasks](/Docs/pics/tasks_table.png)
 
 Примечание: поле status_id ссылается на таблицу statuses, поле priority_id ссылается на таблицу priorities. Поле project_id ссылается на таблицу projects, удаление проекта приводит к удалению задач (CASCADE). Поле assigned_to ссылается на таблицу users.
 
@@ -98,6 +102,8 @@
 - created_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()  
 - owner_id — BIGINT REFERENCES users(id) ON DELETE SET NULL
 
+![teams](/Docs/pics/teams_table.png)
+
 Примечание: owner_id ссылается на пользователя, при удалении пользователя становится NULL.
 
 ---
@@ -121,6 +127,8 @@
 - new_value — TEXT  
 - changed_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()
 
+![log_history](/Docs/pics/log_history.png)
+
 Примечание: журнал изменений по задачам.
 
 ---
@@ -131,6 +139,8 @@
 - user_id — BIGINT REFERENCES users(id)  
 - hours_spent — NUMERIC(6,2) NOT NULL CHECK (hours_spent >= 0 AND hours_spent <= 16)  
 - entry_date — DATE NOT NULL DEFAULT CURRENT_DATE
+
+![time_tracking](/Docs/pics/time_tracking_table.png)
 
 Примечание: учёт затраченного времени по задачам.
 
