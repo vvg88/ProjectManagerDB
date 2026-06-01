@@ -219,8 +219,9 @@ BEGIN
 
   -- Добавить файлы к задачам
   CALL add_file_to_task(v_task_ui_comp_id, 'ui-components-guide.pdf', '/uploads/ui-components-guide.pdf', 'pdf', v_error_code);
-  CALL add_file_to_task(v_task_ui_comp_id, 'design-system.figma', '/uploads/design-system.figma', 'figma', v_error_code);
-  CALL add_file_to_task(v_task_db_design_id, 'schema-design.sql', '/uploads/schema-design.sql', 'sql', v_error_code);
-  CALL add_file_to_task(v_task_db_design_id, 'ER-diagram.png', '/uploads/ER-diagram.png', 'png', v_error_code);
-  CALL add_file_to_task(v_task_api_doc_id, 'endpoints.md', '/uploads/endpoints.md', 'md', v_error_code);
+  CALL add_file_to_task(v_task_ui_comp_id, 'design-system.pdf', '/uploads/design-system.pdf', 'pdf', v_error_code);
+  CALL add_file_to_task(v_task_db_design_id, 'schema-design.doc', '/uploads/schema-design.doc', 'doc', v_error_code);
+  CALL add_file_to_task(v_task_db_design_id, 'ER-diagram.zip', '/uploads/ER-diagram.zip', 'zip', v_error_code);
+  CALL add_file_to_task(v_task_api_doc_id, 'endpoints.doc', '/uploads/endpoints.doc', 'doc', v_error_code);
+  CALL add_file_to_task(v_task_api_setup_id, 'endpoints.doc', '/uploads/endpoints.doc', 'doc', v_error_code);
 END $$;
