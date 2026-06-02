@@ -34,6 +34,7 @@
 - email — VARCHAR(255), NOT NULL, UNIQUE  
 - password_hash — TEXT, NOT NULL  
 - created_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()
+- is_active - BOOLEAN DEFAULT TRUE
 
 Примечание: хранит пользователей приложения.
 
@@ -49,6 +50,8 @@
 - created_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()  
 - owner_id — BIGINT NOT NULL REFERENCES users(id)
 
+![projects](/Docs/pics/projects_table.png)
+
 Примечание: хранит проекты. owner_id ссылается на users, поле status_id ссылается на таблицу statuses.
 
 ---
@@ -61,21 +64,23 @@
 - status_id — BIGINT NOT NULL REFERENCES statuses(id)  
 - priority_id — BIGINT REFERENCES priorities(id)  
 - project_id — BIGINT NOT NULL REFERENCES projects(id) ON DELETE CASCADE  
-- assigned_to — BIGINT REFERENCES users(id) ON DELETE SET NULL  
+- assigned_to — BIGINT REFERENCES users(id)  
 - created_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()
 
-Примечание: поле status_id ссылается на таблицу statuses, поле priority_id ссылается на таблицу priorities. Поле project_id ссылается на таблицу projects, удаление проекта приводит к удалению задач (CASCADE). Поле assigned_to ссылается на таблицу users, при удалении пользователя поле assigned_to становится NULL.
+![tasks](/Docs/pics/tasks_table.png)
+
+Примечание: поле status_id ссылается на таблицу statuses, поле priority_id ссылается на таблицу priorities. Поле project_id ссылается на таблицу projects, удаление проекта приводит к удалению задач (CASCADE). Поле assigned_to ссылается на таблицу users.
 
 ---
 
 **COMMENTS**
 - id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
 - task_id — BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE  
-- user_id — BIGINT REFERENCES users(id) ON DELETE SET NULL  
+- user_id — BIGINT REFERENCES users(id)  
 - content — TEXT, NOT NULL  
 - created_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()
 
-Примечание: комментарии привязаны к задачам, удаление пользователя обнуляет user_id, удаление задачи удаляет комментарий.
+Примечание: комментарии привязаны к задачам, удаление задачи удаляет комментарий.
 
 ---
 
@@ -84,6 +89,7 @@
 - task_id — BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE  
 - file_name — VARCHAR(255), NOT NULL  
 - file_path — TEXT, NOT NULL  
+- file_type — file_type NOT NULL (enum: 'zip', 'rar', '7z', 'pdf', 'log', 'doc', 'other')  
 - uploaded_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()
 
 Примечание: хранит информацию о файлах, прикреплённых к задачам. Удаление задачи удаляет файлы, приложенные к ней.
@@ -96,6 +102,8 @@
 - created_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()  
 - owner_id — BIGINT REFERENCES users(id) ON DELETE SET NULL
 
+![teams](/Docs/pics/teams_table.png)
+
 Примечание: owner_id ссылается на пользователя, при удалении пользователя становится NULL.
 
 ---
@@ -103,7 +111,7 @@
 **TEAM_MEMBERS**
 - id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
 - team_id — BIGINT NOT NULL REFERENCES teams(id) ON DELETE CASCADE  
-- user_id — BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE  
+- user_id — BIGINT NOT NULL REFERENCES users(id)  
 - role — team_role NOT NULL DEFAULT 'member' (enum: 'lead', 'developer', 'tester', 'devops', 'manager', 'analyst', 'member')
 
 Примечание: таблица связи пользователей и команд.
@@ -113,11 +121,13 @@
 **LOG_HISTORY**
 - id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
 - task_id — BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE  
-- changed_by — BIGINT REFERENCES users(id) ON DELETE SET NULL  
+- changed_by — BIGINT REFERENCES users(id)  
 - change_type — change_type NOT NULL (enum: 'status', 'name', 'description', 'comment', 'assignment', 'due_date', 'priority')  
 - old_value — TEXT  
 - new_value — TEXT  
 - changed_at — TIMESTAMP WITH TIME ZONE, DEFAULT now()
+
+![log_history](/Docs/pics/log_history.png)
 
 Примечание: журнал изменений по задачам.
 
@@ -126,9 +136,11 @@
 **TIME_TRACKING**
 - id — BIGINT GENERATED ALWAYS AS IDENTITY, PRIMARY KEY  
 - task_id — BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE  
-- user_id — BIGINT REFERENCES users(id) ON DELETE SET NULL  
-- hours_spent — NUMERIC(6,2) NOT NULL CHECK (hours_spent >= 0)  
+- user_id — BIGINT REFERENCES users(id)  
+- hours_spent — NUMERIC(6,2) NOT NULL CHECK (hours_spent >= 0 AND hours_spent <= 16)  
 - entry_date — DATE NOT NULL DEFAULT CURRENT_DATE
+
+![time_tracking](/Docs/pics/time_tracking_table.png)
 
 Примечание: учёт затраченного времени по задачам.
 

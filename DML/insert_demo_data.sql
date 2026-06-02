@@ -1,6 +1,6 @@
 SET search_path = proj_manager, PUBLIC;
 
--- Create statuses
+-- Statuses
 INSERT INTO statuses (status) VALUES
   ('planned'),
   ('active'),
@@ -9,85 +9,219 @@ INSERT INTO statuses (status) VALUES
   ('cancelled')
 ON CONFLICT (status) DO NOTHING;
 
--- Create priorities
-INSERT INTO priorities (priority_level, color_code) VALUES
-  ('low', '#00FF00'),
-  ('normal', '#FFFF00'),
-  ('high', '#FFA500'),
-  ('urgent', '#FF0000')
+-- Priorities
+INSERT INTO priorities (priority_level) VALUES
+  ('low'),
+  ('normal'),
+  ('high'),
+  ('urgent')
+ON CONFLICT (priority_level) DO NOTHING;
 
--- Create demo users. DO NOT USE md5 in production; this is just for demo purposes.
+-- Создать пользователей с хэшами паролей для демонстрационных целей
 INSERT INTO users (username, email, password_hash) VALUES
-  ('alice', 'alice@example.com', md5('demo_hash_alice')),
-  ('bob', 'bob@example.com', md5('demo_hash_bob')),
-  ('carol', 'carol@example.com', md5('demo_hash_carol')),
-  ('dave', 'dave@example.com', md5('demo_hash_dave')),
-  ('eve', 'eve@example.com', md5('demo_hash_eve')),
-  ('frank', 'frank@example.com', md5('demo_hash_frank')),
-  ('grace', 'grace@example.com', md5('demo_hash_grace')),
-  ('heidi', 'heidi@example.com', md5('demo_hash_heidi')),
-  ('ivan', 'ivan@example.com', md5('demo_hash_ivan')),
-  ('john', 'john@example.com', md5('demo_hash_john')),
-  ('max', 'max@example.com', md5('demo_hash_max'))
-
+  ('Bob', 'bob@example.com', md5('demo_hash_bob')),
+  ('Carol', 'carol@example.com', md5('demo_hash_carol')),
+  ('Frank', 'frank@example.com', md5('demo_hash_frank')),
+  ('Grace', 'grace@example.com', md5('demo_hash_grace')),
+  ('Heidi', 'heidi@example.com', md5('demo_hash_heidi')),
+  ('Ivan', 'ivan@example.com', md5('demo_hash_ivan')),
+  ('John', 'john@example.com', md5('demo_hash_john')),
+  ('Max', 'max@example.com', md5('demo_hash_max'))
 ON CONFLICT (username) DO NOTHING;
 
--- Insert demo projects
-INSERT INTO projects (name, description, start_date, end_date, status_id, owner_id) VALUES
-  ('Frontend App', 'Develop frontend application', '2025-12-01', '2025-07-30',
-    (SELECT id FROM statuses WHERE status = 'active'),
-    (SELECT id FROM users WHERE username = 'bob')),
-  ('Mobile App', 'Develop mobile app for iOS and Android', '2026-02-01', '2026-09-30',
-    (SELECT id FROM statuses WHERE status = 'planned'),
-    (SELECT id FROM users WHERE username = 'bob')),
-  ('Data Migration', 'Migrate data to new warehouse', '2025-06-01', '2025-11-30',
-    (SELECT id FROM statuses WHERE status = 'completed'),
-    (SELECT id FROM users WHERE username = 'carol')),
-  ('Backend App', 'Develop backend services for API', '2025-12-01', '2026-06-30',
-    (SELECT id FROM statuses WHERE status = 'active'),
-    (SELECT id FROM users WHERE username = 'carol')),
-  ('Security Audit', 'Third-party security audit of systems', '2025-09-15', '2025-10-15',
-    (SELECT id FROM statuses WHERE status = 'completed'),
-    (SELECT id FROM users WHERE username = 'alice')),
-  ('Marketing Campaign', 'Q2 marketing push for new product', '2026-01-12', '2026-02-28',
-    (SELECT id FROM statuses WHERE status = 'on_hold'),
-    (SELECT id FROM users WHERE username = 'alice'));
+DO $$
+DECLARE
+  v_error_code INT;
+BEGIN
+  -- Вставить демонстрационные проекты с использованием хранимых процедур
+  CALL create_project(
+    'Frontend App',
+    'Разработка фронтенд-приложения',
+    '2026-01-15',
+    '2026-08-31',
+    'active',
+    'Bob',
+    v_error_code
+  );
 
--- Create demo teams
-INSERT INTO teams (team_name, owner_id) VALUES
-  ('Marketing', (SELECT id FROM users WHERE username = 'alice')),
-  ('Frontend', (SELECT id FROM users WHERE username = 'bob')),
-  ('Backend', (SELECT id FROM users WHERE username = 'carol'))
+  CALL create_project(
+    'Backend App',
+    'Разработка бэкенд-сервисов для API',
+    '2026-02-01',
+    '2026-09-15',
+    'active',
+    'Carol',
+    v_error_code
+  );
+END $$;
 
-INSERT INTO team_members (team_id, user_id, role) VALUES
-  ((SELECT id FROM teams WHERE team_name = 'Marketing'), (SELECT id FROM users WHERE username = 'alice'), 'lead'),
-  ((SELECT id FROM teams WHERE team_name = 'Marketing'), (SELECT id FROM users WHERE username = 'dave'), 'analyst'),
-  ((SELECT id FROM teams WHERE team_name = 'Marketing'), (SELECT id FROM users WHERE username = 'eve'), 'member'),
-  ((SELECT id FROM teams WHERE team_name = 'Frontend'), (SELECT id FROM users WHERE username = 'bob'), 'lead'),
-  ((SELECT id FROM teams WHERE team_name = 'Frontend'), (SELECT id FROM users WHERE username = 'frank'), 'developer'),
-  ((SELECT id FROM teams WHERE team_name = 'Frontend'), (SELECT id FROM users WHERE username = 'grace'), 'developer'),
-  ((SELECT id FROM teams WHERE team_name = 'Frontend'), (SELECT id FROM users WHERE username = 'heidi'), 'tester'),
-  ((SELECT id FROM teams WHERE team_name = 'Backend'), (SELECT id FROM users WHERE username = 'carol'), 'lead'),
-  ((SELECT id FROM teams WHERE team_name = 'Backend'), (SELECT id FROM users WHERE username = 'ivan'), 'developer'),
-  ((SELECT id FROM teams WHERE team_name = 'Backend'), (SELECT id FROM users WHERE username = 'john'), 'developer'),
-  ((SELECT id FROM teams WHERE team_name = 'Backend'), (SELECT id FROM users WHERE username = 'max'), 'devops')
+DO $$
+DECLARE
+  v_error_code INT;
+BEGIN  
+  -- Добавить команды с помощью хранимых процедур
+  CALL create_team(
+    'Frontend Team',
+    'Bob',
+    v_error_code
+  );
 
-INSERT INTO tasks (name, description, due_date, status_id, project_id, assigned_to)
-SELECT
-  'Design UI components',
-  'Create and document core UI components and design system.',
-  '2026-01-15',
-  (SELECT id FROM statuses WHERE status = 'active' LIMIT 1),
-  (SELECT id FROM projects WHERE name = 'Frontend App' LIMIT 1),
-  (SELECT id FROM users WHERE username = 'frank' LIMIT 1)
+  CALL create_team(
+    'Backend Team',
+    'Carol',
+    v_error_code
+  );
 
-INSERT INTO tasks (name, description, due_date, status_id, project_id, assigned_to)
-SELECT
-  'Decompose december features',
-  'Break down December roadmap features into smaller tasks, estimate effort and assign owners.',
-  '2025-12-15',
-  (SELECT id FROM statuses WHERE status = 'completed' LIMIT 1),
-  (SELECT id FROM projects WHERE name = 'Frontend App' LIMIT 1),
-  (SELECT id FROM users WHERE username = 'bob' LIMIT 1)
+  -- Добавить членов команды с использованием хранимых процедур
+  CALL add_team_member('Frontend Team', 'Bob', v_error_code, 'lead');
+  CALL add_team_member('Frontend Team', 'Frank', v_error_code, 'developer');
+  CALL add_team_member('Frontend Team', 'Grace', v_error_code, 'developer');
+  CALL add_team_member('Frontend Team', 'Heidi', v_error_code, 'tester');
+  CALL add_team_member('Backend Team', 'Carol', v_error_code, 'lead');
+  CALL add_team_member('Backend Team', 'Ivan', v_error_code, 'developer');
+  CALL add_team_member('Backend Team', 'John', v_error_code, 'developer');
+  CALL add_team_member('Backend Team', 'Max', v_error_code, 'devops');
+END $$;
 
-  -- To be continued
+-- Вставить демонстрационные задачи с использованием хранимых процедур
+DO $$
+DECLARE
+  v_error_code INT;
+  v_frontend_project_id BIGINT;
+  v_backend_project_id BIGINT;
+BEGIN
+  -- Сохранять ID проектов в переменные для использования при создании задач
+  SELECT id INTO v_frontend_project_id FROM projects WHERE name = 'Frontend App' LIMIT 1;
+  SELECT id INTO v_backend_project_id FROM projects WHERE name = 'Backend App' LIMIT 1;
+
+  CALL create_task(
+    'Разработка UI компонентов',
+    'Создать основные UI компоненты для фронтенд-приложения, включая кнопки, формы и навигацию.',
+    '2026-05-20',
+    'active',
+    'high',
+    v_frontend_project_id,
+    v_error_code,
+    'Frank'
+  );
+
+  CALL create_task(
+    'Реализация UI аутентификации',
+    'Создать интерфейсы входа и регистрации пользователей с использованием лучших практик безопасности.',
+    '2026-05-25',
+    'active',
+    'high',
+    v_frontend_project_id,
+    v_error_code,
+    'Grace'
+  );
+
+  CALL create_task(
+    'Настройка backend API',
+    'Разработать и развернуть RESTful API для управления данными приложения.',
+    '2026-05-15',
+    'active',
+    'urgent',
+    v_backend_project_id,
+    v_error_code,
+    'Carol'
+  );
+
+  CALL create_task(
+    'Дизайн базы данных',
+    'Создать и оптимизировать схему базы данных для бэкенд-сервисов.',
+    '2026-05-20',
+    'active',
+    'high',
+    v_backend_project_id,
+    v_error_code,
+    'Ivan'
+  );
+
+  CALL create_task(
+    'Документация API endpoint',
+    'Создать подробную документацию для всех API endpoint.',
+    '2026-05-22',
+    'active',
+    'normal',
+    v_backend_project_id,
+    v_error_code,
+    'John'
+  );
+END $$;
+
+DO $$
+DECLARE
+  v_error_code INT;
+  v_task_ui_comp_id BIGINT;
+  v_task_ui_auth_id BIGINT;
+  v_task_api_setup_id BIGINT;
+  v_task_db_design_id BIGINT;
+  v_task_api_doc_id BIGINT;
+BEGIN
+  -- Получить ID задач для добавления комментариев
+  SELECT id INTO v_task_ui_comp_id FROM tasks WHERE name = 'Разработка UI компонентов' LIMIT 1;
+  SELECT id INTO v_task_ui_auth_id FROM tasks WHERE name = 'Реализация UI аутентификации' LIMIT 1;
+  SELECT id INTO v_task_api_setup_id FROM tasks WHERE name = 'Настройка backend API' LIMIT 1;
+  SELECT id INTO v_task_db_design_id FROM tasks WHERE name = 'Дизайн базы данных' LIMIT 1;
+  SELECT id INTO v_task_api_doc_id FROM tasks WHERE name = 'Документация API endpoint' LIMIT 1;
+
+-- Добавить комментарии к задачам с использованием хранимых процедур
+  CALL add_comment_to_task(
+    v_task_ui_comp_id,
+    'Bob',
+    'Убедиться, что дизайн соответствует гайдлайнам компании. Использовать цветовую палитру из дизайн-системы.',
+    v_error_code
+  );
+
+  CALL add_comment_to_task(
+    v_task_ui_auth_id,
+    'Heidi',
+    'Компоненты выглядят хорошо. Готовы к тестированию после завершения разработки.',
+    v_error_code
+  );
+
+  CALL add_comment_to_task(
+    v_task_api_setup_id,
+    'Carol',
+    'Необходимо уточнить стратегию аутентификации API перед реализацией.',
+    v_error_code
+  );
+
+  CALL add_comment_to_task(
+    v_task_api_setup_id,
+    'Max',
+    'Настройка инфраструктуры в процессе. Docker контейнеры готовы.',
+    v_error_code
+  );
+
+  CALL add_comment_to_task(
+    v_task_ui_auth_id,
+    'Bob',
+    'Координировать с бэкендом для получения деталей реализации OAuth2.',
+    v_error_code
+  );
+
+  -- Добавить записи времени
+  CALL add_time_entry(v_task_ui_comp_id, 'Frank', '2026-05-20', 4.5, v_error_code);
+  CALL add_time_entry(v_task_ui_auth_id, 'Frank', '2026-05-21', 3.0, v_error_code);
+  CALL add_time_entry(v_task_ui_comp_id, 'Frank', '2026-05-24', 4.0, v_error_code);
+  CALL add_time_entry(v_task_ui_auth_id, 'Grace', '2026-05-25', 5.5, v_error_code);
+  CALL add_time_entry(v_task_db_design_id, 'Ivan', '2026-05-20', 5.5, v_error_code);
+  CALL add_time_entry(v_task_db_design_id, 'Ivan', '2026-05-21', 4.0, v_error_code);
+  CALL add_time_entry(v_task_api_setup_id, 'Carol', '2026-05-15', 6.0, v_error_code);
+  CALL add_time_entry(v_task_api_setup_id, 'Carol', '2026-05-16', 5.0, v_error_code);
+  CALL add_time_entry(v_task_api_doc_id, 'John', '2026-05-22', 3.5, v_error_code);
+
+  -- Добавить зависимости между задачами
+  CALL set_task_dependency(v_task_api_setup_id, v_task_db_design_id, 'successor_of', v_error_code);
+  CALL set_task_dependency(v_task_api_doc_id, v_task_api_setup_id, 'successor_of', v_error_code);
+
+  -- Добавить файлы к задачам
+  CALL add_file_to_task(v_task_ui_comp_id, 'ui-components-guide.pdf', '/uploads/ui-components-guide.pdf', 'pdf', v_error_code);
+  CALL add_file_to_task(v_task_ui_comp_id, 'design-system.pdf', '/uploads/design-system.pdf', 'pdf', v_error_code);
+  CALL add_file_to_task(v_task_db_design_id, 'schema-design.doc', '/uploads/schema-design.doc', 'doc', v_error_code);
+  CALL add_file_to_task(v_task_db_design_id, 'ER-diagram.zip', '/uploads/ER-diagram.zip', 'zip', v_error_code);
+  CALL add_file_to_task(v_task_api_doc_id, 'endpoints.doc', '/uploads/endpoints.doc', 'doc', v_error_code);
+  CALL add_file_to_task(v_task_api_setup_id, 'endpoints.doc', '/uploads/endpoints.doc', 'doc', v_error_code);
+END $$;

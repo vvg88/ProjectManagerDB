@@ -24,7 +24,7 @@ FROM tasks t
 JOIN statuses st ON t.status_id = st.id
 JOIN priorities pr ON t.priority_id = pr.id
 JOIN users u ON t.assigned_to = u.id
-WHERE t.project_id = :project_id;
+WHERE t.project_id = 7;
 
 -- Выбор всех комментариев для конкретной задачи с именами комментаторов и датой создания
 SELECT c.id,
@@ -33,7 +33,7 @@ SELECT c.id,
        c.created_at
 FROM comments c
 JOIN users u ON c.user_id = u.id
-WHERE c.task_id = :task_id;
+WHERE c.task_id = 3;
 
 -- Выбор всех файлов, прикрепленных к конкретной задаче, с их именами, путями, типами и датой загрузки
 SELECT f.id,
@@ -42,7 +42,19 @@ SELECT f.id,
        f.file_type,
        f.created_at
 FROM files f
-WHERE f.task_id = :task_id;
+WHERE f.task_id = 3;
+
+-- Обновить задачу
+DO $$
+    DECLARE v_error_code INT;
+BEGIN
+    CALL update_task_with_log(
+        3,
+        'Carol',
+        v_error_code,
+        p_due_date => '2026-06-15'
+    );
+END $$;
 
 -- Выбор истории изменений для конкретной задачи с типами изменений, старыми и новыми значениями, датой изменения и именами пользователей, которые внесли изменения
 SELECT lh.id,
@@ -53,27 +65,7 @@ SELECT lh.id,
        u.username AS changed_by_username
 FROM log_history lh
 JOIN users u ON lh.changed_by = u.id
-WHERE lh.task_id = :task_id;
-
--- Выбор зависимостей задач для конкретной задачи с типами зависимостей и именами зависимых задач
-SELECT td.id,
-       td.dependency_type,
-       t1.name AS task_name,
-       t2.name AS dependent_task_name
-FROM task_dependencies td
-JOIN tasks t1 ON td.task_id = t1.id
-JOIN tasks t2 ON td.dependent_task_id = t2.id
-WHERE td.task_id = :task_id;
-
--- Выбор членов команды
-SELECT tm.id,
-       t.team_name,
-       u.username,
-       tm.role
-FROM teams t
-JOIN team_members tm ON t.id = tm.team_id
-JOIN users u ON tm.user_id = u.id
-WHERE t.id = :team_id;
+WHERE lh.task_id = 3;
 
 -- Выбор членов команды конкретного проекта с их ролями
 SELECT p.id AS project_id,
@@ -87,7 +79,7 @@ FROM projects p
 JOIN teams t ON p.owner_id = t.owner_id
 JOIN team_members tm ON t.id = tm.team_id
 JOIN users u ON tm.user_id = u.id
-WHERE p.id = :project_id;
+WHERE p.id = 7;
 
 -- Выбор времени, затраченного пользователями на конкретную задачу, с датой и именами пользователей
 SELECT t.id,
@@ -99,6 +91,6 @@ SELECT t.id,
 FROM tasks t
 JOIN time_tracking tt ON t.id = tt.task_id
 LEFT JOIN users u ON tt.user_id = u.id
-WHERE tt.task_id = :task_id
+WHERE tt.task_id = 3
 GROUP BY t.id, u.id, tt.entry_date
 ORDER BY tt.entry_date DESC;
