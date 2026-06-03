@@ -19,13 +19,13 @@ ON CONFLICT (priority_level) DO NOTHING;
 
 -- Создать пользователей с хэшами паролей для демонстрационных целей
 INSERT INTO users (username, email, password_hash) VALUES
-  ('Bob', 'bob@example.com', md5('demo_hash_bob')),
-  ('Carol', 'carol@example.com', md5('demo_hash_carol')),
-  ('Frank', 'frank@example.com', md5('demo_hash_frank')),
-  ('Grace', 'grace@example.com', md5('demo_hash_grace')),
-  ('Heidi', 'heidi@example.com', md5('demo_hash_heidi')),
+  ('Boris', 'boris@example.com', md5('demo_hash_boris')),
+  ('Alisa', 'alisa@example.com', md5('demo_hash_alisa')),
+  ('Alexander', 'alexander@example.com', md5('demo_hash_alexander')),
+  ('Maria', 'maria@example.com', md5('demo_hash_maria')),
+  ('Dmitriy', 'dmitriy@example.com', md5('demo_hash_dmitriy')),
   ('Ivan', 'ivan@example.com', md5('demo_hash_ivan')),
-  ('John', 'john@example.com', md5('demo_hash_john')),
+  ('Nikolai', 'nikolai@example.com', md5('demo_hash_nikolai')),
   ('Max', 'max@example.com', md5('demo_hash_max'))
 ON CONFLICT (username) DO NOTHING;
 
@@ -40,7 +40,7 @@ BEGIN
     '2026-01-15',
     '2026-08-31',
     'active',
-    'Bob',
+    'Boris',
     v_error_code
   );
 
@@ -50,7 +50,7 @@ BEGIN
     '2026-02-01',
     '2026-09-15',
     'active',
-    'Carol',
+    'Alisa',
     v_error_code
   );
 END $$;
@@ -62,24 +62,24 @@ BEGIN
   -- Добавить команды с помощью хранимых процедур
   CALL create_team(
     'Frontend Team',
-    'Bob',
+    'Boris',
     v_error_code
   );
 
   CALL create_team(
     'Backend Team',
-    'Carol',
+    'Alisa',
     v_error_code
   );
 
   -- Добавить членов команды с использованием хранимых процедур
-  CALL add_team_member('Frontend Team', 'Bob', v_error_code, 'lead');
-  CALL add_team_member('Frontend Team', 'Frank', v_error_code, 'developer');
-  CALL add_team_member('Frontend Team', 'Grace', v_error_code, 'developer');
-  CALL add_team_member('Frontend Team', 'Heidi', v_error_code, 'tester');
-  CALL add_team_member('Backend Team', 'Carol', v_error_code, 'lead');
+  CALL add_team_member('Frontend Team', 'Boris', v_error_code, 'lead');
+  CALL add_team_member('Frontend Team', 'Alexander', v_error_code, 'developer');
+  CALL add_team_member('Frontend Team', 'Maria', v_error_code, 'developer');
+  CALL add_team_member('Frontend Team', 'Dmitriy', v_error_code, 'tester');
+  CALL add_team_member('Backend Team', 'Alisa', v_error_code, 'lead');
   CALL add_team_member('Backend Team', 'Ivan', v_error_code, 'developer');
-  CALL add_team_member('Backend Team', 'John', v_error_code, 'developer');
+  CALL add_team_member('Backend Team', 'Nikolai', v_error_code, 'developer');
   CALL add_team_member('Backend Team', 'Max', v_error_code, 'devops');
 END $$;
 
@@ -102,7 +102,7 @@ BEGIN
     'high',
     v_frontend_project_id,
     v_error_code,
-    'Frank'
+    'Alexander'
   );
 
   CALL create_task(
@@ -113,7 +113,7 @@ BEGIN
     'high',
     v_frontend_project_id,
     v_error_code,
-    'Grace'
+    'Maria'
   );
 
   CALL create_task(
@@ -124,7 +124,7 @@ BEGIN
     'urgent',
     v_backend_project_id,
     v_error_code,
-    'Carol'
+    'Alisa'
   );
 
   CALL create_task(
@@ -146,7 +146,7 @@ BEGIN
     'normal',
     v_backend_project_id,
     v_error_code,
-    'John'
+    'Nikolai'
   );
 END $$;
 
@@ -169,21 +169,21 @@ BEGIN
 -- Добавить комментарии к задачам с использованием хранимых процедур
   CALL add_comment_to_task(
     v_task_ui_comp_id,
-    'Bob',
+    'Boris',
     'Убедиться, что дизайн соответствует гайдлайнам компании. Использовать цветовую палитру из дизайн-системы.',
     v_error_code
   );
 
   CALL add_comment_to_task(
     v_task_ui_auth_id,
-    'Heidi',
+    'Dmitriy',
     'Компоненты выглядят хорошо. Готовы к тестированию после завершения разработки.',
     v_error_code
   );
 
   CALL add_comment_to_task(
     v_task_api_setup_id,
-    'Carol',
+    'Alisa',
     'Необходимо уточнить стратегию аутентификации API перед реализацией.',
     v_error_code
   );
@@ -197,21 +197,21 @@ BEGIN
 
   CALL add_comment_to_task(
     v_task_ui_auth_id,
-    'Bob',
+    'Boris',
     'Координировать с бэкендом для получения деталей реализации OAuth2.',
     v_error_code
   );
 
   -- Добавить записи времени
-  CALL add_time_entry(v_task_ui_comp_id, 'Frank', '2026-05-20', 4.5, v_error_code);
-  CALL add_time_entry(v_task_ui_auth_id, 'Frank', '2026-05-21', 3.0, v_error_code);
-  CALL add_time_entry(v_task_ui_comp_id, 'Frank', '2026-05-24', 4.0, v_error_code);
-  CALL add_time_entry(v_task_ui_auth_id, 'Grace', '2026-05-25', 5.5, v_error_code);
+  CALL add_time_entry(v_task_ui_comp_id, 'Alexander', '2026-05-20', 4.5, v_error_code);
+  CALL add_time_entry(v_task_ui_auth_id, 'Alexander', '2026-05-21', 3.0, v_error_code);
+  CALL add_time_entry(v_task_ui_comp_id, 'Alexander', '2026-05-24', 4.0, v_error_code);
+  CALL add_time_entry(v_task_ui_auth_id, 'Maria', '2026-05-25', 5.5, v_error_code);
   CALL add_time_entry(v_task_db_design_id, 'Ivan', '2026-05-20', 5.5, v_error_code);
   CALL add_time_entry(v_task_db_design_id, 'Ivan', '2026-05-21', 4.0, v_error_code);
-  CALL add_time_entry(v_task_api_setup_id, 'Carol', '2026-05-15', 6.0, v_error_code);
-  CALL add_time_entry(v_task_api_setup_id, 'Carol', '2026-05-16', 5.0, v_error_code);
-  CALL add_time_entry(v_task_api_doc_id, 'John', '2026-05-22', 3.5, v_error_code);
+  CALL add_time_entry(v_task_api_setup_id, 'Alisa', '2026-05-15', 6.0, v_error_code);
+  CALL add_time_entry(v_task_api_setup_id, 'Alisa', '2026-05-16', 5.0, v_error_code);
+  CALL add_time_entry(v_task_api_doc_id, 'Nikolai', '2026-05-22', 3.5, v_error_code);
 
   -- Добавить зависимости между задачами
   CALL set_task_dependency(v_task_api_setup_id, v_task_db_design_id, 'successor_of', v_error_code);
