@@ -12,7 +12,8 @@ FROM projects p
 JOIN users u ON p.owner_id = u.id
 JOIN statuses s ON p.status_id = s.id;
 
--- Выбор всех задач для конкретного проекта с их статусами, приоритетами и именами назначенных пользователей
+-- Выбор всех задач для проекта 'Backend App' c их статусами,
+-- приоритетами и именами назначенных пользователей
 SELECT t.id,
        t.name,
        t.description,
@@ -26,7 +27,8 @@ JOIN priorities pr ON t.priority_id = pr.id
 JOIN users u ON t.assigned_to = u.id
 WHERE t.project_id = 7;
 
--- Выбор всех комментариев для конкретной задачи с именами комментаторов и датой создания
+-- Выбор всех комментариев для задачи 'Настройка backend API' 
+-- с именами комментаторов и датой создания
 SELECT c.id,
        c.content,
        u.username AS commenter_username,
@@ -35,7 +37,8 @@ FROM comments c
 JOIN users u ON c.user_id = u.id
 WHERE c.task_id = 3;
 
--- Выбор всех файлов, прикрепленных к конкретной задаче, с их именами, путями, типами и датой загрузки
+-- Выбор всех файлов, прикрепленных к задаче 'Настройка backend API'
+-- с их именами, путями, типами и датой загрузки
 SELECT f.id,
        f.file_name,
        f.file_path,
@@ -44,7 +47,7 @@ SELECT f.id,
 FROM files f
 WHERE f.task_id = 3;
 
--- Обновить задачу
+-- Обновить задачу 'Настройка backend API'
 DO $$
     DECLARE v_error_code INT;
 BEGIN
@@ -52,11 +55,13 @@ BEGIN
         3,
         'Carol',
         v_error_code,
-        p_due_date => '2026-06-15'
+        p_due_date => '2026-06-18'
     );
 END $$;
 
--- Выбор истории изменений для конкретной задачи с типами изменений, старыми и новыми значениями, датой изменения и именами пользователей, которые внесли изменения
+-- Выбор истории изменений для конкретной задачи с типами изменений,
+-- старыми и новыми значениями, датой изменения и именами пользователей,
+-- которые внесли изменения
 SELECT lh.id,
        lh.change_type,
        lh.old_value,
@@ -67,7 +72,7 @@ FROM log_history lh
 JOIN users u ON lh.changed_by = u.id
 WHERE lh.task_id = 3;
 
--- Выбор членов команды конкретного проекта с их ролями
+-- Выбор членов команды проекта 'Backend App' с их ролями
 SELECT p.id AS project_id,
        p.name AS project_name,
        t.id AS team_id,
@@ -81,7 +86,8 @@ JOIN team_members tm ON t.id = tm.team_id
 JOIN users u ON tm.user_id = u.id
 WHERE p.id = 7;
 
--- Выбор времени, затраченного пользователями на конкретную задачу, с датой и именами пользователей
+-- Выбор времени, затраченного пользователями на задачу 'Настройка backend API',
+-- с датой и именами пользователей
 SELECT t.id,
        t.name,
        u.id AS user_id,
